@@ -6,6 +6,8 @@ class ProfitLine(BaseModel):
     dish_name: str
     spec_name: str
     sale_price: float
+    ingredient_cost: float
+    packaging_cost: float
     cost: float
     gross_profit: float
     gross_margin: float

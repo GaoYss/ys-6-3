@@ -42,7 +42,7 @@ class SpecificationUpdate(BaseModel):
     dish_id: str | None = None
     name: str | None = Field(default=None, min_length=1, max_length=60)
     serving_size: str | None = Field(default=None, min_length=1, max_length=60)
-    sale_price: float | None = Field(default=None, gt=0)
+    sale_price: float | None = Field(default=None, ge=0)
     ingredient_cost: float | None = Field(default=None, ge=0)
     packaging_cost: float | None = Field(default=None, ge=0)
 

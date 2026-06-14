@@ -152,7 +152,7 @@ h2 {
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
 }
 
@@ -427,6 +427,39 @@ textarea {
   position: absolute;
   right: 12px;
   top: 12px;
+}
+
+.spec-card dl .cost-breakdown {
+  color: #66736b;
+}
+
+.spec-card dl .cost-breakdown dd {
+  font-weight: 500;
+  color: #526159;
+}
+
+.spec-card dl .cost-total {
+  grid-column: 1 / -1;
+  border-top: 1px dashed #dce2d7;
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.spec-card dl .cost-total dt {
+  font-weight: 700;
+  color: #1d2527;
+}
+
+.spec-card dl .cost-total dd {
+  color: #2d6a4f;
+}
+
+.spec-card dl .profit-row {
+  grid-column: 1 / -1;
+}
+
+.spec-card dl .profit-row dd {
+  color: #d94a30;
 }
 
 .margin-cell {

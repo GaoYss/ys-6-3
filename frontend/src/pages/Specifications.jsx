@@ -56,8 +56,26 @@ export function Specifications({ dishes, specifications, refresh }) {
                 <dl>
                   <div><dt>出品量</dt><dd>{spec.serving_size}</dd></div>
                   <div><dt>售价</dt><dd>¥{spec.sale_price}</dd></div>
-                  <div><dt>成本</dt><dd>¥{(spec.ingredient_cost + spec.packaging_cost).toFixed(1)}</dd></div>
-                  <div><dt>毛利率</dt><dd>{Math.round(spec.gross_margin * 100)}%</dd></div>
+                  <div className="cost-breakdown">
+                    <dt>原料成本</dt>
+                    <dd>¥{spec.ingredient_cost.toFixed(1)}</dd>
+                  </div>
+                  <div className="cost-breakdown">
+                    <dt>包装损耗</dt>
+                    <dd>¥{spec.packaging_cost.toFixed(1)}</dd>
+                  </div>
+                  <div className="cost-total">
+                    <dt>总成本</dt>
+                    <dd>¥{(spec.ingredient_cost + spec.packaging_cost).toFixed(1)}</dd>
+                  </div>
+                  <div className="profit-row">
+                    <dt>毛利</dt>
+                    <dd>¥{spec.gross_profit.toFixed(1)}</dd>
+                  </div>
+                  <div>
+                    <dt>毛利率</dt>
+                    <dd>{spec.sale_price > 0 ? Math.round(spec.gross_margin * 100) : 0}%</dd>
+                  </div>
                 </dl>
                 <button className="danger icon-only" onClick={() => remove(spec)} type="button" title="删除规格">
                   <Trash2 size={15} />
