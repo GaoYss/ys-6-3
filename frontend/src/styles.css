@@ -500,6 +500,25 @@ textarea {
   border: 1px solid #f5c6bd;
 }
 
+.notice.success {
+  color: #1c6b47;
+  background: #e2f4e8;
+  border: 1px solid #b7e0c2;
+}
+
+.input-error {
+  border-color: #e27465 !important;
+  background: #fff5f2;
+}
+
+.field-error {
+  color: #a23b2d;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
+  display: block;
+}
+
 .empty-state {
   min-height: 180px;
   display: grid;

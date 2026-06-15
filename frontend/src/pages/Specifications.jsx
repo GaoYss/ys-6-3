@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AlertCircle, Plus, Save, Trash2 } from 'lucide-react'
+import { AlertCircle, CheckCircle, Plus, Save, Trash2 } from 'lucide-react'
 import { api } from '../api/client.js'
 import { EmptyState } from '../components/EmptyState.jsx'
 
@@ -15,15 +15,30 @@ const initialForm = {
 export function Specifications({ dishes, specifications, refresh }) {
   const [form, setForm] = useState(initialForm)
   const [error, setError] = useState(null)
+  const [fieldErrors, setFieldErrors] = useState({})
+  const [success, setSuccess] = useState(null)
+
+  const clearMessages = () => {
+    setError(null)
+    setFieldErrors({})
+    setSuccess(null)
+  }
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }))
-    if (error) setError(null)
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => {
+        const next = { ...prev }
+        delete next[field]
+        return next
+      })
+    }
+    if (error || success) clearMessages()
   }
 
   const submit = async (event) => {
     event.preventDefault()
-    setError(null)
+    clearMessages()
     try {
       await api.createSpecification({
         ...form,
@@ -32,16 +47,27 @@ export function Specifications({ dishes, specifications, refresh }) {
         packaging_cost: Number(form.packaging_cost),
       })
       setForm(initialForm)
+      setSuccess('规格已保存成功')
+      setTimeout(() => setSuccess(null), 3000)
       refresh()
     } catch (err) {
       setError(err.message || '保存失败，请检查输入')
+      if (err.fieldErrors) {
+        const map = {}
+        for (const item of err.fieldErrors) {
+          map[item.field] = item.message
+        }
+        setFieldErrors(map)
+      }
     }
   }
 
   const remove = async (spec) => {
-    setError(null)
+    clearMessages()
     try {
       await api.deleteSpecification(spec.id)
+      setSuccess(`规格「${spec.name}」已删除`)
+      setTimeout(() => setSuccess(null), 2500)
       refresh()
     } catch (err) {
       setError(`删除「${spec.name}」失败：${err.message || '请稍后重试'}`)
@@ -49,6 +75,8 @@ export function Specifications({ dishes, specifications, refresh }) {
   }
 
   const dishName = (id) => dishes.find((dish) => dish.id === id)?.name || '未知菜品'
+
+  const fieldErrorFor = (field) => fieldErrors[field]
 
   return (
     <div className="two-column">
@@ -106,6 +134,12 @@ export function Specifications({ dishes, specifications, refresh }) {
           <Plus size={18} />
         </div>
         <form className="form" onSubmit={submit}>
+          {success && (
+            <div className="notice success">
+              <CheckCircle size={16} />
+              <span>{success}</span>
+            </div>
+          )}
           {error && (
             <div className="notice error">
               <AlertCircle size={16} />
@@ -114,34 +148,80 @@ export function Specifications({ dishes, specifications, refresh }) {
           )}
           <label>
             关联菜品
-            <select value={form.dish_id} onChange={(event) => updateField('dish_id', event.target.value)} required>
+            <select
+              value={form.dish_id}
+              onChange={(event) => updateField('dish_id', event.target.value)}
+              className={fieldErrorFor('dish_id') ? 'input-error' : ''}
+              required
+            >
               <option value="">选择菜品</option>
               {dishes.map((dish) => (
                 <option key={dish.id} value={dish.id}>{dish.name}</option>
               ))}
             </select>
+            {fieldErrorFor('dish_id') && <small className="field-error">{fieldErrorFor('dish_id')}</small>}
           </label>
           <label>
             规格名称
-            <input value={form.name} onChange={(event) => updateField('name', event.target.value)} required />
+            <input
+              value={form.name}
+              onChange={(event) => updateField('name', event.target.value)}
+              className={fieldErrorFor('name') ? 'input-error' : ''}
+              required
+            />
+            {fieldErrorFor('name') && <small className="field-error">{fieldErrorFor('name')}</small>}
           </label>
           <label>
             出品量
-            <input value={form.serving_size} onChange={(event) => updateField('serving_size', event.target.value)} placeholder="例如 250g" required />
+            <input
+              value={form.serving_size}
+              onChange={(event) => updateField('serving_size', event.target.value)}
+              placeholder="例如 250g"
+              className={fieldErrorFor('serving_size') ? 'input-error' : ''}
+              required
+            />
+            {fieldErrorFor('serving_size') && <small className="field-error">{fieldErrorFor('serving_size')}</small>}
           </label>
           <div className="form-grid">
             <label>
               售价
-              <input type="number" min="0" step="0.1" value={form.sale_price} onChange={(event) => updateField('sale_price', event.target.value)} required />
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={form.sale_price}
+                onChange={(event) => updateField('sale_price', event.target.value)}
+                className={fieldErrorFor('sale_price') ? 'input-error' : ''}
+                required
+              />
+              {fieldErrorFor('sale_price') && <small className="field-error">{fieldErrorFor('sale_price')}</small>}
             </label>
             <label>
               原料成本
-              <input type="number" min="0" step="0.1" value={form.ingredient_cost} onChange={(event) => updateField('ingredient_cost', event.target.value)} required />
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={form.ingredient_cost}
+                onChange={(event) => updateField('ingredient_cost', event.target.value)}
+                className={fieldErrorFor('ingredient_cost') ? 'input-error' : ''}
+                required
+              />
+              {fieldErrorFor('ingredient_cost') && <small className="field-error">{fieldErrorFor('ingredient_cost')}</small>}
             </label>
           </div>
           <label>
             包装/损耗成本
-            <input type="number" min="0" step="0.1" value={form.packaging_cost} onChange={(event) => updateField('packaging_cost', event.target.value)} required />
+            <input
+              type="number"
+              min="0"
+              step="0.1"
+              value={form.packaging_cost}
+              onChange={(event) => updateField('packaging_cost', event.target.value)}
+              className={fieldErrorFor('packaging_cost') ? 'input-error' : ''}
+              required
+            />
+            {fieldErrorFor('packaging_cost') && <small className="field-error">{fieldErrorFor('packaging_cost')}</small>}
           </label>
           <button className="primary" type="submit">
             <Save size={16} />

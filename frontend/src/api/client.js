@@ -15,7 +15,9 @@ async function request(path, options = {}) {
 
   const data = await response.json()
   if (!response.ok) {
-    throw new Error(data.detail || '请求失败')
+    const error = new Error(data.detail || '请求失败')
+    error.fieldErrors = data.field_errors || null
+    throw error
   }
   return data
 }
