@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Save, Trash2 } from 'lucide-react'
+import { AlertCircle, Plus, Save, Trash2 } from 'lucide-react'
 import { api } from '../api/client.js'
 import { EmptyState } from '../components/EmptyState.jsx'
 
@@ -14,24 +14,38 @@ const initialForm = {
 
 export function Specifications({ dishes, specifications, refresh }) {
   const [form, setForm] = useState(initialForm)
+  const [error, setError] = useState(null)
 
-  const updateField = (field, value) => setForm((current) => ({ ...current, [field]: value }))
+  const updateField = (field, value) => {
+    setForm((current) => ({ ...current, [field]: value }))
+    if (error) setError(null)
+  }
 
   const submit = async (event) => {
     event.preventDefault()
-    await api.createSpecification({
-      ...form,
-      sale_price: Number(form.sale_price),
-      ingredient_cost: Number(form.ingredient_cost),
-      packaging_cost: Number(form.packaging_cost),
-    })
-    setForm(initialForm)
-    refresh()
+    setError(null)
+    try {
+      await api.createSpecification({
+        ...form,
+        sale_price: Number(form.sale_price),
+        ingredient_cost: Number(form.ingredient_cost),
+        packaging_cost: Number(form.packaging_cost),
+      })
+      setForm(initialForm)
+      refresh()
+    } catch (err) {
+      setError(err.message || '保存失败，请检查输入')
+    }
   }
 
   const remove = async (spec) => {
-    await api.deleteSpecification(spec.id)
-    refresh()
+    setError(null)
+    try {
+      await api.deleteSpecification(spec.id)
+      refresh()
+    } catch (err) {
+      setError(`删除「${spec.name}」失败：${err.message || '请稍后重试'}`)
+    }
   }
 
   const dishName = (id) => dishes.find((dish) => dish.id === id)?.name || '未知菜品'
@@ -92,6 +106,12 @@ export function Specifications({ dishes, specifications, refresh }) {
           <Plus size={18} />
         </div>
         <form className="form" onSubmit={submit}>
+          {error && (
+            <div className="notice error">
+              <AlertCircle size={16} />
+              <span>{error}</span>
+            </div>
+          )}
           <label>
             关联菜品
             <select value={form.dish_id} onChange={(event) => updateField('dish_id', event.target.value)} required>

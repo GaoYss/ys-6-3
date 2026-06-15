@@ -29,7 +29,7 @@ class SpecificationBase(BaseModel):
     dish_id: str
     name: str = Field(min_length=1, max_length=60)
     serving_size: str = Field(min_length=1, max_length=60)
-    sale_price: float = Field(gt=0)
+    sale_price: float = Field(ge=0)
     ingredient_cost: float = Field(ge=0)
     packaging_cost: float = Field(ge=0)
 
